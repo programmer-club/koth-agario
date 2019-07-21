@@ -1,12 +1,14 @@
 
 class Action {
 
-    move_x = 0
-    move_y = 0
+    target_x = 0;
+    target_y = 0;
+    do_split = 0;
 
-    constructor(move_x,move_y){
-        this.move_x=move_x
-        this.move_y=move_y
+    constructor(target_x,target_y,do_split){
+        this.target_x=target_x;
+        this.target_y=target_y;
+        this.do_split=do_split
     }
 
 }
