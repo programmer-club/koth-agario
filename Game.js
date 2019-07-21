@@ -1,7 +1,7 @@
 
 let GAME_PARAMS={
-    width: 4000,
-    height: 4000
+    width: 1500,
+    height: 1000
 };
 
 
