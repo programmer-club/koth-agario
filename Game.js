@@ -10,10 +10,6 @@ class Game{
     players = [];
 
     colors=[
-        0xFF5544,
-        0x4455FF,
-        0x55FF44,
-        0x44FF55
     ];
 
     pellets=[];
@@ -23,10 +19,15 @@ class Game{
     }
 
     setup(){
-        this.players.push(new Player(0, 200, 500));
-        this.players.push(new Player(1, 800, 500));
-        this.players.push(new Player(2, 500, 200));
-        this.players.push(new Player(3, 500, 800));
+        // this.players.push(new Player(0, 200, 500));
+        // this.players.push(new Player(1, 800, 500));
+        // this.players.push(new Player(2, 500, 200));
+        // this.players.push(new Player(3, 500, 800));
+        let m=20
+        for(let i=0;i<10;i++){
+            this.players.push(new Player(i, Math.random()*(GAME_PARAMS.width-m*2)+m,Math.random()*(GAME_PARAMS.height-m*2)+m))
+            this.colors.push(Math.floor(0xFFFFFF*Math.random()))
+        }
     }
 
     summon_pellet(){
@@ -43,7 +44,7 @@ class Game{
             const SLOWDOWN = 0.9;
 
             let action = this.players[index].next_action(this);
-
+            if(!action)continue
             if(action.do_split){
                 const MIN_SPLIT_MASS = 50;
                 let new_cells=[];
@@ -52,8 +53,9 @@ class Game{
                 for(let i=0;i<old_cells.length;i++){
                     if(old_cells[i].mass>=MIN_SPLIT_MASS){
                         del_cells.push(old_cells[i]);
-                        new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,Math.floor(old_cells[i].mass/2)));
-                        new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,old_cells[i].mass-Math.floor(old_cells[i].mass/2)))
+                        let DELAY=5000
+                        new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY));
+                        new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,old_cells[i].mass-Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY))
                     }
                 }
                 this.players[index].cells=this.players[index].cells.filter(cell => !del_cells.includes(cell));
@@ -67,9 +69,10 @@ class Game{
             for (let i = 0; i < cells.length; i++) {
                 cells[i].vel_x *= SLOWDOWN;
                 cells[i].vel_y *= SLOWDOWN;
+                cells[i].update()
                 for (let j = 0; j < cells.length; j++) {
                     if (i === j) continue;
-                    if (cells[i].intersects(cells[j])) {
+                    if (cells[i].intersects(cells[j])&&!Game.should_merge(cells[i],cells[j])) {
                         Game.seperate(cells[i], cells[j])
                     } else {
                         // Game.go_closer(cells[i],cells[j])
@@ -96,6 +99,10 @@ class Game{
             if(!dead_pellets[i])new_pellets.push(this.pellets[i])
         }
         this.pellets=new_pellets
+    }
+
+    static should_merge(c0,c1){
+        return c0.can_merge()&&c1.can_merge()
     }
 
     static move_cell(cell,action,MOVE_FACTOR){
@@ -191,7 +198,13 @@ class Game{
 
     cell_kill(i0,j0,i1,j1,c0,c1){
         // i0,j0,c0 kills i1,j1,c1
-        this.players[i0].cells[j0].mass+=this.players[i1].cells[j1].mass
+        let LOSS
+        if(i0===i1)LOSS=1.0
+        else LOSS=0.8
+        this.players[i0].cells[j0].mass+=Math.floor(this.players[i1].cells[j1].mass*LOSS)
+        if(i0===i1){
+            this.players[i0].cells[j0].merge_end+=5000
+        }
         app.stage.removeChild(this.players[i1].cells[j1].pixi_text)
         this.players[i1].cells.splice(j1,1)
     }
