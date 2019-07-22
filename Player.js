@@ -14,6 +14,14 @@ class Player {
         this.fat=Math.random()<0.5
     }
 
+    total_mass(){
+        let m=0
+        for(let i=0;i<this.cells.length;i++){
+            m+=this.cells[i].mass
+        }
+        return m
+    }
+
     is_dead(){
         return this.cells.length===0
     }
