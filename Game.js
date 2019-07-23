@@ -18,15 +18,33 @@ class Game{
     constructor(){
     }
 
+    instantiate(i,m,bot){
+        this.players.push(new bot(i, Math.random()*(GAME_PARAMS.width-m*2)+m,Math.random()*(GAME_PARAMS.height-m*2)+m))
+        this.colors.push(Math.floor(0xFFFFFF*Math.random()))
+    }
+
+    bots=[
+        {
+            bot: BotMackycheese0,
+            count: 10
+        },
+        {
+            bot: BotMackycheese1,
+            count: 1
+        }
+    ]
+
     setup(){
         // this.players.push(new Player(0, 200, 500));
         // this.players.push(new Player(1, 800, 500));
         // this.players.push(new Player(2, 500, 200));
         // this.players.push(new Player(3, 500, 800));
         let m=20
-        for(let i=0;i<10;i++){
-            this.players.push(new Player(i, Math.random()*(GAME_PARAMS.width-m*2)+m,Math.random()*(GAME_PARAMS.height-m*2)+m))
-            this.colors.push(Math.floor(0xFFFFFF*Math.random()))
+        let id=0
+        for(let i=0;i<this.bots.length;i++){
+            for(let j=0;j<this.bots[i].count;j++){
+                this.instantiate(id++,m,this.bots[i].bot)
+            }
         }
     }
 
@@ -67,6 +85,7 @@ class Game{
 
             let cells = this.players[index].cells;
             for (let i = 0; i < cells.length; i++) {
+                cells[i].mass = Math.ceil(0.999*cells[i].mass)
                 cells[i].vel_x *= SLOWDOWN;
                 cells[i].vel_y *= SLOWDOWN;
                 cells[i].update()

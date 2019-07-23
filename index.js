@@ -76,8 +76,8 @@ app.ticker.add(()=>{
     }
 
     game.frame();
-    // game.frame();
-    // game.frame();
+    game.frame();
+    game.frame();
 
     stats.end()
 });
