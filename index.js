@@ -37,7 +37,7 @@ let render_cell=(cell)=>{
 
     cell.pixi_text.position.x=cell.render_x;
     cell.pixi_text.position.y=cell.render_y;
-    cell.pixi_text.text=""+cell.mass;
+    cell.pixi_text.text=(cell.mass>300?game.players[cell.player_id].name+": ":"")+cell.mass;
 
     app.stage.addChild(cell.pixi_text)
 };

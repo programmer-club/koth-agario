@@ -57,7 +57,7 @@ class Cell {
     }
 
     can_kill(other_cell){
-        return this.mass>=other_cell.mass*1.25&&utils.dist(this.x,this.y,other_cell.x,other_cell.y)<this.rad/2+other_cell.rad/2
+        return this.mass>=other_cell.mass*1.25&&utils.dist(this.x,this.y,other_cell.x,other_cell.y)<this.rad-other_cell.rad*0.75
     }
 
 }

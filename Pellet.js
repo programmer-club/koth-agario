@@ -4,7 +4,12 @@ class Pellet {
     y=0;
     color=0;
     radius=5;
+    mass=5
     pixi_circle=undefined;
+
+    get rad(){
+        return 5
+    }
 
     constructor(x,y,color){
         this.x=x;

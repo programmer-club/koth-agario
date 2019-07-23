@@ -4,6 +4,18 @@ let GAME_PARAMS={
     height: 1000
 };
 
+const randColor=()=>Math.floor(0xFFFFFF*Math.random());
+
+const rand=(x)=>Math.floor(Math.random()*x)
+const comp2hex=(c)=>{
+    let h=c.toString(16)
+    return (h.length===1?"0":"")+h
+}
+const make_color=(r,g,b)=>{
+    let h=comp2hex(r)+comp2hex(g)+comp2hex(b)
+    return parseInt(h, 16);
+}
+
 
 class Game{
 
@@ -18,32 +30,43 @@ class Game{
     constructor(){
     }
 
-    instantiate(i,m,bot){
-        this.players.push(new bot(i, Math.random()*(GAME_PARAMS.width-m*2)+m,Math.random()*(GAME_PARAMS.height-m*2)+m))
-        this.colors.push(Math.floor(0xFFFFFF*Math.random()))
+    instantiate(i,m,bot,col){
+        this.players.push(new bot(i, Math.random()*(GAME_PARAMS.width-m*2)+m,Math.random()*(GAME_PARAMS.height-m*2)+m));
+        this.colors.push(col)
     }
 
+    // START BOTS
     bots=[
         {
             bot: BotMackycheese0,
-            count: 10
+            count: 5,
+            color: ()=>make_color(255,rand(100),rand(100))
         },
         {
             bot: BotMackycheese1,
-            count: 1
+            count: 5,
+            color: ()=>make_color(rand(100),255,rand(100))
+        },
+        {
+            bot: BotMackycheese2,
+            count: 5,
+            color: ()=>make_color(rand(100),rand(100),255)
         }
-    ]
+    ];
+    //END BOTS
 
     setup(){
         // this.players.push(new Player(0, 200, 500));
         // this.players.push(new Player(1, 800, 500));
         // this.players.push(new Player(2, 500, 200));
         // this.players.push(new Player(3, 500, 800));
-        let m=20
-        let id=0
+        let m=20;
+        let id=0;
         for(let i=0;i<this.bots.length;i++){
+            // console.log("ID "+i+" = "+color);
             for(let j=0;j<this.bots[i].count;j++){
-                this.instantiate(id++,m,this.bots[i].bot)
+                let color=this.bots[i].color()
+                this.instantiate(id++,m,this.bots[i].bot,color)
             }
         }
     }
@@ -62,7 +85,8 @@ class Game{
             const SLOWDOWN = 0.9;
 
             let action = this.players[index].next_action(this);
-            if(!action)continue
+            if(!action)continue;
+            let num_cells=this.players[index].cells.length;
             if(action.do_split){
                 const MIN_SPLIT_MASS = 50;
                 let new_cells=[];
@@ -71,8 +95,17 @@ class Game{
                 for(let i=0;i<old_cells.length;i++){
                     if(old_cells[i].mass>=MIN_SPLIT_MASS){
                         del_cells.push(old_cells[i]);
-                        let DELAY=5000
-                        new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY));
+                        let DELAY=5000;
+                        let dx=action.target_x-old_cells[i].x;
+                        let dy=action.target_y-old_cells[i].y;
+                        if(dx*dx+dy*dy>5){
+                            let m=Math.sqrt(dx*dx+dy*dy);
+                            dx/=m;
+                            dy/=m
+                        }
+                        num_cells+=1;
+                        if(num_cells>16)continue;
+                        new_cells.push(new Cell(old_cells[i].x+dx,old_cells[i].y+dy,index,Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY));
                         new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,old_cells[i].mass-Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY))
                     }
                 }
@@ -85,10 +118,10 @@ class Game{
 
             let cells = this.players[index].cells;
             for (let i = 0; i < cells.length; i++) {
-                cells[i].mass = Math.ceil(0.999*cells[i].mass)
+                // cells[i].mass = Math.ceil(0.999*cells[i].mass)
                 cells[i].vel_x *= SLOWDOWN;
                 cells[i].vel_y *= SLOWDOWN;
-                cells[i].update()
+                cells[i].update();
                 for (let j = 0; j < cells.length; j++) {
                     if (i === j) continue;
                     if (cells[i].intersects(cells[j])&&!Game.should_merge(cells[i],cells[j])) {
@@ -182,49 +215,49 @@ class Game{
             this.update_player(i)
         }
 
-        this.resolve_eats()
+        this.resolve_eats();
 
-        if(Math.random()<0.75) this.summon_pellet()
+        if(Math.random()<0.5) this.summon_pellet()
         // this.summon_pellet()
         // this.summon_pellet()
 
     }
 
     resolve_eats() {
-        let recurse=false
-        let done=false
+        let recurse=false;
+        let done=false;
         this.foreach_cell((i0, j0, _) => {
-            if(done)return
+            if(done)return;
             this.foreach_cell((i1, j1, _) => {
-                if(done)return
+                if(done)return;
                 if (i0 === i1 && j0 === j1) return;
-                let cell0 = this.players[i0].cells[j0]
-                let cell1 = this.players[i1].cells[j1]
+                let cell0 = this.players[i0].cells[j0];
+                let cell1 = this.players[i1].cells[j1];
                 // console.log(cell0,cell1)
                 if (cell0.can_kill(cell1)) {
-                    this.cell_kill(i0, j0, i1, j1, cell0, cell1)
-                    done=true
+                    this.cell_kill(i0, j0, i1, j1, cell0, cell1);
+                    done=true;
                     recurse=true
                 } else if (cell1.can_kill(cell0)) {
-                    this.cell_kill(i1, j1, i0, j0, cell1, cell0)
-                    done=true
+                    this.cell_kill(i1, j1, i0, j0, cell1, cell0);
+                    done=true;
                     recurse=true
                 }
             })
-        })
+        });
         if(recurse)this.resolve_eats()
     }
 
     cell_kill(i0,j0,i1,j1,c0,c1){
         // i0,j0,c0 kills i1,j1,c1
-        let LOSS
-        if(i0===i1)LOSS=1.0
-        else LOSS=0.8
-        this.players[i0].cells[j0].mass+=Math.floor(this.players[i1].cells[j1].mass*LOSS)
+        let LOSS;
+        if(i0===i1)LOSS=1.0;
+        else LOSS=0.8;
+        this.players[i0].cells[j0].mass+=Math.floor(this.players[i1].cells[j1].mass*LOSS);
         if(i0===i1){
             this.players[i0].cells[j0].merge_end+=5000
         }
-        app.stage.removeChild(this.players[i1].cells[j1].pixi_text)
+        app.stage.removeChild(this.players[i1].cells[j1].pixi_text);
         this.players[i1].cells.splice(j1,1)
     }
 

@@ -4,6 +4,10 @@ class Player {
     id = 0;
     cells=[];
 
+    get name(){
+        return "AbstractPlayer"
+    }
+
     constructor(id,x,y) {
         this.id = id;
         // this.cells = [new Cell(x, y, 0,30),new Cell(x+10,y,0,40),new Cell(x,y+5,0,100),new Cell(x-10,y-10,0,200)]

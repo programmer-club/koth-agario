@@ -1,6 +1,10 @@
 
 class BotMackycheese0 extends Player{
 
+    get name(){
+        return "BotMackycheese0"
+    }
+
     constructor(id,x,y){
         super(id,x,y)
     }
