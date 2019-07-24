@@ -51,6 +51,11 @@ class Game{
             bot: BotMackycheese2,
             count: 5,
             color: ()=>make_color(rand(100),rand(100),255)
+        },
+        {
+            bot: BotPlayer,
+            count: 1,
+            color: ()=>make_color(150,150,150)
         }
     ];
     //END BOTS

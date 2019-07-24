@@ -1,4 +1,6 @@
 
+let g=new PIXI.Graphics();
+g.interactive=true
 let game=new Game();
 
 const app=new PIXI.Application({
@@ -16,7 +18,6 @@ app.stage.interactive=true;
 
 document.body.appendChild(app.view);
 
-let g=new PIXI.Graphics();
 app.stage.addChild(g);
 
 let stats=new Stats();
@@ -32,6 +33,10 @@ let render_cell=(cell)=>{
     g.lineStyle(1,0x000000);
     g.drawCircle(cell.render_x,cell.render_y,cell.render_rad);
     g.endFill();
+
+    g.lineStyle(1,0x000000)
+    g.moveTo(cell.render_x,cell.render_y)
+    g.lineTo(cell.render_x+cell.vel_x*500,cell.render_y+cell.vel_y*500)
 
     app.stage.removeChild(cell.pixi_text);
 

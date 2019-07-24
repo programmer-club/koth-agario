@@ -38,17 +38,35 @@ class BotMackycheese2 extends Player{
 
     next_action(game){
         let vec={x:0,y:0};
+        let vecs=[]
         for(let i=0;i<game.pellets.length;i++){
             let v=this.get_vector_for_cell(game.pellets[i].x,game.pellets[i].y,game.pellets[i].rad,game.pellets[i].mass)
+            vecs.push(v)
             vec.x+=v.x;
             vec.y+=v.y;
         }
+        // vecs.sort((a,b)=>{
+        //     a=a.x*a.x+a.y*a.y
+        //     b=b.x*b.x+b.y*b.y
+        //     if(a>b)return -1
+        //     if(b>a)return 1
+        //     return 0
+        // })
         game.foreach_cell((player_id,cell_id,cell)=>{
             if(this.id===player_id)return;
             let v=this.get_vector_for_cell(cell.x,cell.y,cell.rad,cell.mass)
+            vecs.push(v)
             vec.x+=v.x;
             vec.y+=v.y;
         })
+        if(isNaN(vec.x))vec.x=0;
+        if(isNaN(vec.y))vec.y=0;
+        let m=Math.sqrt(vec.x*vec.x+vec.y*vec.y)*0.001;
+        vec.x/=m;
+        vec.y/=m;
+        if(isNaN(vec.x))vec.x=0;
+        if(isNaN(vec.y))vec.y=0;
+        // vec=vecs[0]
         // console.log(vec.x,vec.y)
         return new Action(this.center_x_mass()+vec.x*0.1,this.center_y_mass()+vec.y*0.1,false)
     }
