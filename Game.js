@@ -135,7 +135,7 @@ class Game{
                         // Game.go_closer(cells[i],cells[j])
                     }
                 }
-                let MOVE_FACTOR = 0.1 / Math.sqrt(cells[i].rad)
+                let MOVE_FACTOR = 1 / cells[i].rad;
                 cells[i].x += cells[i].vel_x;
                 cells[i].y += cells[i].vel_y;
                 Game.move_cell(cells[i],action,MOVE_FACTOR);
