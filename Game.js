@@ -109,7 +109,7 @@ class Game{
                             dy/=m
                         }
                         num_cells+=1;
-                        if(num_cells>16)continue;
+                        // if(num_cells>16)continue;
                         new_cells.push(new Cell(old_cells[i].x+dx,old_cells[i].y+dy,index,Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY));
                         new_cells.push(new Cell(old_cells[i].x,old_cells[i].y,index,old_cells[i].mass-Math.floor(old_cells[i].mass/2),new Date().getTime()+DELAY))
                     }
@@ -135,7 +135,7 @@ class Game{
                         // Game.go_closer(cells[i],cells[j])
                     }
                 }
-                let MOVE_FACTOR = 1 / cells[i].rad;
+                let MOVE_FACTOR = 1 / Math.pow(cells[i].rad,1.1);
                 cells[i].x += cells[i].vel_x;
                 cells[i].y += cells[i].vel_y;
                 Game.move_cell(cells[i],action,MOVE_FACTOR);

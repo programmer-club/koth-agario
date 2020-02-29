@@ -8,7 +8,7 @@ const app=new PIXI.Application({
     height:GAME_PARAMS.height,
     antialias:true,
     transparent:false,
-    resolution:0.5,
+    resolution:1.0,
     backgroundColor:0xAAAAAA
 });
 
